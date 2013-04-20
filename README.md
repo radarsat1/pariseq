@@ -1,6 +1,6 @@
 
-sequenceDriver
-==============
+Pariseq
+=======
 
 Driving sequencer, made for musichackday Paris, April 20, 2013.
 
