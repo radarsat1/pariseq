@@ -12,6 +12,8 @@ var cars = [];
 var sounds = [];
 var population = [];
 
+var mainTimer = null;
+
 function distance(a, b)
 {
     var dx = a[0] - b[0];
@@ -310,8 +312,31 @@ function init()
 
     initCars();
 
-    var t = setInterval(moveCars, 30);
-    //setTimeout(function() {clearInterval(t);}, 30000);
+    updateView();
 
+    ongo();
+}
+
+function onstop()
+{
+    if (mainTimer != null)
+        clearInterval(mainTimer)
+    mainTimer = null;
+    updateView();
+    document.getElementById('go').disabled = false;
+    document.getElementById('stop').disabled = true;
+}
+
+function ongo()
+{
+    stop();
+    mainTimer = setInterval(moveCars, 30);
+    document.getElementById('go').disabled = true;
+    document.getElementById('stop').disabled = false;
+}
+
+function onclear()
+{
+    cars = [];
     updateView();
 }
