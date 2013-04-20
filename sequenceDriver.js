@@ -1,8 +1,12 @@
 
 var canv, ctx, mapimg, carsimg;
-var dragging=false;
 var currentSelected=null;
 var currentDrag=null;
+
+var currentCar=null;
+var currentCursorPos=null;
+var currentClosest=null;
+var currentDest=null;
 
 var cars = [];
 var sounds = [];
@@ -15,18 +19,57 @@ function distance(a, b)
     return Math.sqrt(dx*dx + dy*dy);
 }
 
-function closestPoint(x, y)
+function closestPoint(point)
 {
     var dist = 1000000;
     var c = null;
     for (i in intersections) {
-        var d = distance(intersections[i], [x,y]);
+        var d = distance(intersections[i], point);
         if (d < dist) {
             dist = d;
-            c = i;
+            c = parseInt(i);
         }
     }
     return c;
+}
+
+// Find all intersections connected to the given intersection
+function connectedIntersections(inter)
+{
+    var connected = {};
+    for (r in roads)
+    {
+        if (roads[r][0] == inter)
+            connected[roads[r][1]] = true;
+        else if (roads[r][1] == inter)
+            connected[roads[r][0]] = true;
+    }
+
+    var ar = [];
+    for (c in connected)
+        if (c!=="undefined")
+            ar.push(parseInt(c));
+
+    return ar;
+}
+
+// Find the intersection connected to the given intersection that is
+// closest to the given point
+function closestConnectedPoint(inter, point)
+{
+    var connected = connectedIntersections(inter);
+
+    var dist = 1000000;
+    var x = null;
+    for (c in connected) {
+        var d = distance(intersections[connected[c]], point);
+        if (d < dist) {
+            dist = d;
+            x = connected[c];
+        }
+    }
+
+    return x;
 }
 
 function Set()
@@ -69,37 +112,61 @@ function drawCar(car)
 
 function updateView()
 {
-    //ctx.drawImage(mapimg, 0, 0);
-    ctx.clearRect(0,0,canv.width,canv.height);
+    //ctx.clearRect(0,0,canv.width,canv.height);
+    ctx.drawImage(mapimg, 0, 0);
 
-    for (p in intersections) {
-        ctx.beginPath();
-        ctx.arc(intersections[p][0], intersections[p][1], 4, 0, 2*Math.PI);
-        ctx.fill();
-    }
+    // if (dragging && currentSelected != null && currentDrag != null) {
+    //     var s = currentSelected;
+    //     var d = currentDrag;
+    //     ctx.beginPath();
+    //     ctx.moveTo(intersections[s][0], intersections[s][1]);
+    //     ctx.lineTo(intersections[d][0], intersections[d][1]);
+    //     ctx.strokeStyle = 'black';
+    //     ctx.stroke();
+    // }
 
-    if (dragging && currentSelected != null && currentDrag != null) {
-        var s = currentSelected;
-        var d = currentDrag;
-        ctx.beginPath();
-        ctx.moveTo(intersections[s][0], intersections[s][1]);
-        ctx.lineTo(intersections[d][0], intersections[d][1]);
-        ctx.strokeStyle = 'black';
-        ctx.stroke();
-    }
+    ctx.lineWidth = 1;
 
-    for (r in roads) {
-        var a = intersections[roads[r][0]];
-        var b = intersections[roads[r][1]];
-        ctx.beginPath();
-        ctx.moveTo(a[0], a[1]);
-        ctx.lineTo(b[0], b[1]);
-        ctx.strokeStyle = 'blue';
-        ctx.stroke();
-    }
+    // for (r in roads) {
+    //     var a = intersections[roads[r][0]];
+    //     var b = intersections[roads[r][1]];
+    //     ctx.beginPath();
+    //     ctx.moveTo(a[0], a[1]);
+    //     ctx.lineTo(b[0], b[1]);
+    //     ctx.strokeStyle = 'blue';
+    //     ctx.stroke();
+    // }
 
     for (var c in cars)
         drawCar(cars[c]);
+
+    // draw drag & dropped car
+    if (currentCar != null && currentClosest != null) {
+        var x = intersections[currentClosest][0];
+        var y = intersections[currentClosest][1];
+        var i = carimgs[currentCar];
+        var w = 15;
+        var h = i.height/i.width*w;
+
+        if (currentDest != null) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(Math.PI/4);
+            ctx.translate(-w/2, -h/2);
+            ctx.drawImage(i, 0, 0, w, h);
+            ctx.restore();
+
+            ctx.beginPath();
+            ctx.moveTo(x,y);
+            ctx.lineTo(intersections[currentDest][0],
+                       intersections[currentDest][1]);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        } else {
+            ctx.drawImage(i, x-w/2, y-h/2, w, h);
+        }
+    }
 }
 
 function moveCars()
@@ -138,6 +205,16 @@ function moveCars()
     updateView();
 }
 
+function initCar(c)
+{
+    cars[c].dist = distance(intersections[cars[c].from],
+                                intersections[cars[c].to]);
+    cars[c].at = 0.0;
+    cars[c].vel = 0.0;
+
+    population[cars[c].from].add(c);
+}
+
 function initCars()
 {
     population = new Array(intersections.length);
@@ -145,16 +222,7 @@ function initCars()
         population[i] = new Set();
 
     for (var c in cars)
-    {
-        cars[c].dist = distance(intersections[cars[c].from],
-                                intersections[cars[c].to]);
-        cars[c].at = 0.0;
-        cars[c].vel = 0.0;
-
-        population[cars[c].from].add(c);
-    }
-
-    cars[0].vel = 3;
+        initCar(c);
 }
 
 function init()
@@ -163,31 +231,53 @@ function init()
     ctx = canv.getContext('2d');
 
     canv.onmousemove = function(e) {
-        if (dragging) {
-            currentDrag = closestPoint(e.x - canv.offsetLeft,
-                                       e.y - canv.offsetTop);
-            updateView();
+        currentCursorPos = [e.x - canv.offsetLeft,
+                            e.y - canv.offsetTop];
+
+        if (currentCar != null) {
+            if (currentDest != null)
+                currentDest = closestConnectedPoint(currentClosest,
+                                                    currentCursorPos);
+            else
+                currentClosest = closestPoint(currentCursorPos);
         }
+
+        updateView();
     }
 
     canv.onmousedown = function(e) {
-        dragging = true;
-        currentSelected = closestPoint(e.x - canv.offsetLeft,
-                                       e.y - canv.offsetTop);
+        currentSelected = closestPoint([e.x - canv.offsetLeft,
+                                        e.y - canv.offsetTop]);
         updateView();
     }
 
     canv.onmouseup = function(e) {
-        if (dragging) {
-            dragging = false;
-            console.log(currentSelected + ' -> ' + currentDrag);
-            roads.push([currentSelected, currentDrag]);
+
+        if (currentCar != null && currentClosest != null) {
+            if (currentDest == null) {
+                currentDest = currentClosest;
+            }
+            else {
+                cars.push(
+                    {car: currentCar,
+                     from: currentClosest,
+                     to: currentDest,
+                     sound: parseInt(Math.random()*sounds.length)
+                    });
+
+                initCar(cars.length-1);
+
+                setTimeout(function(){cars[cars.length-1].vel = 3;}, 200);
+
+                currentCar = null;
+                currentDest = null;
+            }
         }
+
         updateView();
     }
 
     canv.onmouseout = function(e) {
-        dragging = false;
     }
 
     mapimg = document.getElementById('map');
@@ -195,21 +285,26 @@ function init()
     carimgs = [ document.getElementById('car1'),
                 document.getElementById('car2') ];
 
+    window.ondragstart = function() {return false;};
+
+    for (var i in carimgs) {
+        carimgs[i].onmousedown = (function(i){return function() {
+            currentCar = parseInt(i);
+        };})(i);
+    }
+
     sounds = [ document.getElementById('beep1'),
                document.getElementById('beep2'),
                document.getElementById('beep3'),
-               document.getElementById('car1'),
-               document.getElementById('car2') ];
+               document.getElementById('drum1'),
+               document.getElementById('drum2') ];
 
-    cars = [
-        {car: 0, from: 130, to: 128, sound: 0},
-        {car: 1, from: 128, to: 126, sound: 1},
-        {car: 1, from: 126, to: 130, sound: 2},
-    ];
+    cars = [];
 
     initCars();
 
-    setInterval(moveCars, 100);
+    var t = setInterval(moveCars, 30);
+    //setTimeout(function() {clearInterval(t);}, 30000);
 
     updateView();
 }

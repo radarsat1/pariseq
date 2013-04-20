@@ -1,2 +1,8 @@
 
+body { font-family: sans; }
+
 .nope { display: none; }
+
+#canv { float: left; }
+
+ul li { list-style-type: none; }
