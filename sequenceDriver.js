@@ -5,6 +5,7 @@ var currentSelected=null;
 var currentDrag=null;
 
 var cars = [];
+var sounds = [];
 var population = [];
 
 function distance(a, b)
@@ -118,6 +119,9 @@ function moveCars()
             {
                 cars[n].vel = 3;
                 p.remove(n);
+
+                // play their starting sound
+                sounds[cars[n].sound].play();
             }
         }
         else if (cars[c].vel < 0 && d < 0)
@@ -191,10 +195,16 @@ function init()
     carimgs = [ document.getElementById('car1'),
                 document.getElementById('car2') ];
 
+    sounds = [ document.getElementById('beep1'),
+               document.getElementById('beep2'),
+               document.getElementById('beep3'),
+               document.getElementById('car1'),
+               document.getElementById('car2') ];
+
     cars = [
-        {car: 0, from: 130, to: 128},
-        {car: 1, from: 128, to: 126},
-        {car: 1, from: 126, to: 130},
+        {car: 0, from: 130, to: 128, sound: 0},
+        {car: 1, from: 128, to: 126, sound: 1},
+        {car: 1, from: 126, to: 130, sound: 2},
     ];
 
     initCars();
