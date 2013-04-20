@@ -54,6 +54,8 @@ function drawCar(car)
     var y2 = intersections[car.to][1];
 
     var angle = Math.atan( (y2 - y1) / (x2 - x1) ) + Math.PI/2;
+    if (x2 < x1)
+        angle += Math.PI;
 
     ctx.save();
     ctx.translate(x1, y1);
