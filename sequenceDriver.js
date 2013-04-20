@@ -14,6 +14,9 @@ var population = [];
 
 var mainTimer = null;
 
+var showMap = null;
+var showRoads = null;
+
 function distance(a, b)
 {
     var dx = a[0] - b[0];
@@ -114,8 +117,10 @@ function drawCar(car)
 
 function updateView()
 {
-    //ctx.clearRect(0,0,canv.width,canv.height);
-    ctx.drawImage(mapimg, 0, 0);
+    if (showMap.checked)
+        ctx.drawImage(mapimg, 0, 0);
+    else
+        ctx.clearRect(0,0,canv.width,canv.height);
 
     // if (dragging && currentSelected != null && currentDrag != null) {
     //     var s = currentSelected;
@@ -129,15 +134,17 @@ function updateView()
 
     ctx.lineWidth = 1;
 
-    // for (r in roads) {
-    //     var a = intersections[roads[r][0]];
-    //     var b = intersections[roads[r][1]];
-    //     ctx.beginPath();
-    //     ctx.moveTo(a[0], a[1]);
-    //     ctx.lineTo(b[0], b[1]);
-    //     ctx.strokeStyle = 'blue';
-    //     ctx.stroke();
-    // }
+    if (showRoads.checked) {
+        for (r in roads) {
+            var a = intersections[roads[r][0]];
+            var b = intersections[roads[r][1]];
+            ctx.beginPath();
+            ctx.moveTo(a[0], a[1]);
+            ctx.lineTo(b[0], b[1]);
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+        }
+    }
 
     for (var c in cars)
         drawCar(cars[c]);
@@ -231,6 +238,9 @@ function init()
 {
     canv = document.getElementById('canv');
     ctx = canv.getContext('2d');
+
+    showMap = document.getElementById('showmap');
+    showRoads = document.getElementById('showroads');
 
     canv.onmousemove = function(e) {
         currentCursorPos = [e.x - canv.offsetLeft,
