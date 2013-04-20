@@ -243,8 +243,8 @@ function init()
     showRoads = document.getElementById('showroads');
 
     canv.onmousemove = function(e) {
-        currentCursorPos = [e.x - canv.offsetLeft,
-                            e.y - canv.offsetTop];
+        currentCursorPos = [e.pageX - canv.offsetLeft,
+                            e.pageY - canv.offsetTop];
 
         if (currentCar != null) {
             if (currentDest != null)
@@ -258,8 +258,8 @@ function init()
     }
 
     canv.onmousedown = function(e) {
-        currentSelected = closestPoint([e.x - canv.offsetLeft,
-                                        e.y - canv.offsetTop]);
+        currentSelected = closestPoint([e.pageX - canv.offsetLeft,
+                                        e.pageY - canv.offsetTop]);
         updateView();
     }
 
