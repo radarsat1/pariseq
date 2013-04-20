@@ -142,8 +142,6 @@ function initCars()
 
     for (var c in cars)
     {
-        cars[c].from = roads[cars[c].road][0];
-        cars[c].to = roads[cars[c].road][1];
         cars[c].dist = distance(intersections[cars[c].from],
                                 intersections[cars[c].to]);
         cars[c].at = 0.0;
@@ -194,8 +192,9 @@ function init()
                 document.getElementById('car2') ];
 
     cars = [
-        {car: 0, road: 0},
-        {car: 1, road: 114},
+        {car: 0, from: 130, to: 128},
+        {car: 1, from: 128, to: 126},
+        {car: 1, from: 126, to: 130},
     ];
 
     initCars();
