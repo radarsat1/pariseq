@@ -262,7 +262,7 @@ function init()
                     {car: currentCar,
                      from: currentClosest,
                      to: currentDest,
-                     sound: parseInt(Math.random()*sounds.length)
+                     sound: currentCar,
                     });
 
                 initCar(cars.length-1);
@@ -283,7 +283,12 @@ function init()
     mapimg = document.getElementById('map');
 
     carimgs = [ document.getElementById('car1'),
-                document.getElementById('car2') ];
+                document.getElementById('car2'),
+                document.getElementById('car3'),
+                document.getElementById('car4'),
+                document.getElementById('car5'),
+                document.getElementById('car6'),
+              ];
 
     window.ondragstart = function() {return false;};
 
@@ -297,7 +302,9 @@ function init()
                document.getElementById('beep2'),
                document.getElementById('beep3'),
                document.getElementById('drum1'),
-               document.getElementById('drum2') ];
+               document.getElementById('drum2'),
+               document.getElementById('siren'),
+             ];
 
     cars = [];
 

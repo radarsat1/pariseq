@@ -3,6 +3,8 @@ body { font-family: sans; }
 
 .nope { display: none; }
 
-#canv { float: left; }
+#canv { float: left; margin-right: 10pt; }
 
 ul li { list-style-type: none; }
+
+.carsel { width: 20px; }
