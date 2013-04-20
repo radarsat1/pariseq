@@ -12,4 +12,6 @@ circuit.
 Marked on the map is Deezer HQ, in Paris' 9th arrondissement, the
 location of musichackday.
 
+Live demo hosted on [github pages](http://radarsat1.github.io/pariseq/).
+
 radarsat1@gmail.com
