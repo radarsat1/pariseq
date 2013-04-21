@@ -11,6 +11,7 @@ var currentDest=null;
 var cars = [];
 var sounds = [];
 var population = [];
+var soundbanks = [];
 
 var mainTimer = null;
 
@@ -214,6 +215,22 @@ function moveCars()
     updateView();
 }
 
+function onbankchange(bank)
+{
+    sounds = soundbanks[bank];
+    updateDesc();
+}
+
+function updateDesc()
+{
+    for (s in sounds) {
+        var x = parseInt(s)+1;
+        var d = sounds[s].attributes.desc.value;
+        var span = document.getElementById('car'+x+'desc');
+        span.innerHTML = d;
+    }
+}
+
 function initCar(c)
 {
     cars[c].dist = distance(intersections[cars[c].from],
@@ -310,13 +327,25 @@ function init()
         };})(i);
     }
 
-    sounds = [ document.getElementById('beep1'),
-               document.getElementById('beep2'),
-               document.getElementById('beep3'),
-               document.getElementById('drum1'),
-               document.getElementById('drum2'),
-               document.getElementById('siren'),
-             ];
+    soundbanks = [
+        [ document.getElementById('beep1'),
+          document.getElementById('beep2'),
+          document.getElementById('beep3'),
+          document.getElementById('drum1'),
+          document.getElementById('drum2'),
+          document.getElementById('siren'),
+        ],
+        [ document.getElementById('piano1'),
+          document.getElementById('piano2'),
+          document.getElementById('piano3'),
+          document.getElementById('piano4'),
+          document.getElementById('piano5'),
+          document.getElementById('piano6'),
+        ]
+    ];
+
+    // default sounds
+    onbankchange(0);
 
     cars = [];
 

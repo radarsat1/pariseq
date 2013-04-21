@@ -8,19 +8,30 @@
 <body onload="init();">
 <canvas width="977" height="541" id="canv"></canvas>
 <img width="977" height="541" src="deezerhq.png" id="map" class="nope"></img>
-<audio src="sounds/beep1.wav" id="beep1" preload="auto" class="nope"></audio>
-<audio src="sounds/beep2.wav" id="beep2" preload="auto" class="nope"></audio>
-<audio src="sounds/beep3.wav" id="beep3" preload="auto" class="nope"></audio>
-<audio src="sounds/drum1.wav" id="drum1" preload="auto" class="nope"></audio>
-<audio src="sounds/drum2.wav" id="drum2" preload="auto" class="nope"></audio>
-<audio src="sounds/siren.wav" id="siren" preload="auto" class="nope"></audio>
+<audio src="sounds/beep1.wav" id="beep1" preload="auto" class="nope" desc="Beep 1"></audio>
+<audio src="sounds/beep2.wav" id="beep2" preload="auto" class="nope" desc="Beep 2"></audio>
+<audio src="sounds/beep3.wav" id="beep3" preload="auto" class="nope" desc="Beep 3"></audio>
+<audio src="sounds/drum1.wav" id="drum1" preload="auto" class="nope" desc="Bass Drum"></audio>
+<audio src="sounds/drum2.wav" id="drum2" preload="auto" class="nope" desc="Clap"></audio>
+<audio src="sounds/siren.wav" id="siren" preload="auto" class="nope" desc="Flic!"></audio>
+<audio src="sounds/piano48.wav" id="piano1" preload="auto" class="nope" desc="Piano C-1"></audio>
+<audio src="sounds/piano51.wav" id="piano2" preload="auto" class="nope" desc="Piano D#"></audio>
+<audio src="sounds/piano53.wav" id="piano3" preload="auto" class="nope" desc="Piano F"></audio>
+<audio src="sounds/piano55.wav" id="piano4" preload="auto" class="nope" desc="Piano G"></audio>
+<audio src="sounds/piano58.wav" id="piano5" preload="auto" class="nope" desc="Piano A#"></audio>
+<audio src="sounds/piano60.wav" id="piano6" preload="auto" class="nope" desc="Piano C0"></audio>
+<div class="soundsel">
+Sound bank selection:
+<br/><input type="radio" name="soundbank" id="bank1" checked onchange="onbankchange(0);"><label for="bank1">Beeps + drums</label></input>
+<br/><input type="radio" name="soundbank" id="bank2" onchange="onbankchange(1);"><label for="bank2">Piano</label></input>
+</div>
 <ul>
-<li><img src="cars/car1.png" id="car1" class="carsel"></img> Beep 1</li>
-<li><img src="cars/car2.png" id="car2" class="carsel"></img> Beep 2</li>
-<li><img src="cars/car3.png" id="car3" class="carsel"></img> Beep 3</li>
-<li><img src="cars/car4.png" id="car4" class="carsel"></img> Drum 1</li>
-<li><img src="cars/car5.png" id="car5" class="carsel"></img> Drum 2</li>
-<li><img src="cars/policecar.png" id="car6" class="carsel"></img> Flic!</li>
+<li><img src="cars/car1.png" id="car1" class="carsel"></img> <span id="car1desc"></span></li>
+<li><img src="cars/car2.png" id="car2" class="carsel"></img> <span id="car2desc"></span></li>
+<li><img src="cars/car3.png" id="car3" class="carsel"></img> <span id="car3desc"></span></li>
+<li><img src="cars/car4.png" id="car4" class="carsel"></img> <span id="car4desc"></span></li>
+<li><img src="cars/car5.png" id="car5" class="carsel"></img> <span id="car5desc"></span></li>
+<li><img src="cars/policecar.png" id="car6" class="carsel"></img> <span id="car6desc"></li>
 </ul>
 <input type="button" value="Go" id="go" onclick="ongo();"></input>
 <input type="button" value="Stop" id="stop" onclick="onstop();"></input>
